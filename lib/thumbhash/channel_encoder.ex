@@ -16,7 +16,7 @@ defmodule Thumbhash.ChannelEncoder do
   end
 
   def encode_channel(params) do
-    {ac, dc, scale} = each_cy(params, 0, 0, {[], 0, 0})
+    {ac, dc, scale} = step_by_cy(params, 0, 0, {[], 0, 0})
 
     ac =
       if scale != 0 do
@@ -28,17 +28,17 @@ defmodule Thumbhash.ChannelEncoder do
     {dc, ac, scale}
   end
 
-  defp each_cy(params, cy, cx, {ac, dc, scale}) when cy < params.ny do
-    {ac, dc, scale} = each_cx(params, cx, cy, {ac, dc, scale})
+  defp step_by_cy(params, cy, cx, {ac, dc, scale}) when cy < params.ny do
+    {ac, dc, scale} = step_by_cx(params, cx, cy, {ac, dc, scale})
 
-    each_cy(params, cy + 1, 0, {ac, dc, scale})
+    step_by_cy(params, cy + 1, 0, {ac, dc, scale})
   end
 
-  defp each_cy(_params, _cy, _cx, {ac, dc, scale}) do
+  defp step_by_cy(_params, _cy, _cx, {ac, dc, scale}) do
     {ac, dc, scale}
   end
 
-  defp each_cx(params, cx, cy, {ac, dc, scale})
+  defp step_by_cx(params, cx, cy, {ac, dc, scale})
        when cx * params.ny < params.nx * (params.ny - cy) do
     fx =
       Enum.reduce(0..(params.w - 1), :array.new(), fn x, fx ->
@@ -69,10 +69,10 @@ defmodule Thumbhash.ChannelEncoder do
         {ac, dc, scale}
       end
 
-    each_cx(params, cx + 1, cy, {ac, dc, scale})
+    step_by_cx(params, cx + 1, cy, {ac, dc, scale})
   end
 
-  defp each_cx(_params, _cx, _ny, {ac, dc, scale}) do
+  defp step_by_cx(_params, _cx, _ny, {ac, dc, scale}) do
     {ac, dc, scale}
   end
 end
