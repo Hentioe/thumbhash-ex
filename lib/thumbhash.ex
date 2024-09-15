@@ -21,21 +21,32 @@ defmodule Thumbhash do
   defmodule LQPA do
     @moduledoc false
 
-    defstruct l: [], q: [], p: [], a: []
+    defstruct l: :array.new(), q: :array.new(), p: :array.new(), a: :array.new()
+
+    def new(size) do
+      %__MODULE__{
+        l: :array.new(size),
+        q: :array.new(size),
+        p: :array.new(size),
+        a: :array.new(size)
+      }
+    end
   end
 
   def rgba_to_thumb_hash(w, h, rgba) do
     # Encoding an image larger than 100x100 is slow with no benefit
     if w > 100 or h > 100, do: raise(FitError, "#{w}x#{h} doesn't fit in 100x100")
+    # 像素数量
+    pixels_count = w * h
 
     # Determine the average color
     avg_px =
-      Enum.reduce(0..(w * h - 1), %RGBA{}, fn i, %{r: r, g: g, b: b, a: a} ->
+      Enum.reduce(0..(pixels_count - 1), %RGBA{}, fn i, %{r: r, g: g, b: b, a: a} ->
         j = i * 4
-        alpha = Enum.at(rgba, j + 3) / 255
-        avg_r = r + alpha / 255 * Enum.at(rgba, j)
-        avg_g = g + alpha / 255 * Enum.at(rgba, j + 1)
-        avg_b = b + alpha / 255 * Enum.at(rgba, j + 2)
+        alpha = :array.get(j + 3, rgba) / 255
+        avg_r = r + alpha / 255 * :array.get(j, rgba)
+        avg_g = g + alpha / 255 * :array.get(j + 1, rgba)
+        avg_b = b + alpha / 255 * :array.get(j + 2, rgba)
         avg_a = a + alpha
 
         %RGBA{
@@ -64,17 +75,18 @@ defmodule Thumbhash do
 
     # # Convert the image from RGBA to LPQA (composite atop the average color)
     lqpa =
-      Enum.reduce(0..(w * h - 1), %LQPA{}, fn i, %{l: l, q: q, p: p, a: a} ->
+      Enum.reduce(0..(pixels_count - 1), LQPA.new(pixels_count), fn i, lqpa ->
+        %{l: l, q: q, p: p, a: a} = lqpa
         j = i * 4
-        alpha = Enum.at(rgba, j + 3) / 255
-        r = avg_px.r * (1 - alpha) + alpha / 255 * Enum.at(rgba, j)
-        g = avg_px.g * (1 - alpha) + alpha / 255 * Enum.at(rgba, j + 1)
-        b = avg_px.b * (1 - alpha) + alpha / 255 * Enum.at(rgba, j + 2)
+        alpha = :array.get(j + 3, rgba) / 255
+        r = avg_px.r * (1 - alpha) + alpha / 255 * :array.get(j, rgba)
+        g = avg_px.g * (1 - alpha) + alpha / 255 * :array.get(j + 1, rgba)
+        b = avg_px.b * (1 - alpha) + alpha / 255 * :array.get(j + 2, rgba)
 
-        l = List.insert_at(l, i, (r + g + b) / 3)
-        p = List.insert_at(p, i, (r + g) / 2 - b)
-        q = List.insert_at(q, i, r - g)
-        a = List.insert_at(a, i, alpha)
+        l = :array.set(i, (r + g + b) / 3, l)
+        p = :array.set(i, (r + g) / 2 - b, p)
+        q = :array.set(i, r - g, q)
+        a = :array.set(i, alpha, a)
 
         %LQPA{
           l: l,
@@ -155,10 +167,8 @@ defmodule Thumbhash do
   end
 
   defp calculate_bytes(ac_start, ac_list, hash) do
-    ac_index = 0
-
     {hash, _} =
-      Enum.reduce(ac_list, {hash, ac_index}, fn ac, {hash, ac_index} ->
+      Enum.reduce(ac_list, {hash, 0}, fn ac, {hash, ac_index} ->
         Enum.reduce(ac, {hash, ac_index}, fn f, {hash, ac_index} ->
           i = ac_start + (ac_index >>> 1)
           nv = :array.get(i, hash) ||| round(15 * f) <<< ((ac_index &&& 1) <<< 2)

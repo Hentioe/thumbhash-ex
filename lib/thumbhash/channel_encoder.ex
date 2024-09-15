@@ -7,7 +7,7 @@ defmodule Thumbhash.ChannelEncoder do
     defstruct [:channel, :nx, :ny, :w, :h]
 
     @type t :: %__MODULE__{
-            channel: list,
+            channel: :array.array(),
             nx: non_neg_integer,
             ny: non_neg_integer,
             w: non_neg_integer,
@@ -40,11 +40,9 @@ defmodule Thumbhash.ChannelEncoder do
 
   defp each_cx(params, cx, cy, {ac, dc, scale})
        when cx * params.ny < params.nx * (params.ny - cy) do
-    fx = []
-
     fx =
-      Enum.reduce(0..(params.w - 1), fx, fn x, fx ->
-        List.insert_at(fx, x, :math.cos(:math.pi() / params.w * cx * (x + 0.5)))
+      Enum.reduce(0..(params.w - 1), :array.new(), fn x, fx ->
+        :array.set(x, :math.cos(:math.pi() / params.w * cx * (x + 0.5)), fx)
       end)
 
     f =
@@ -53,7 +51,7 @@ defmodule Thumbhash.ChannelEncoder do
 
         f +
           Enum.reduce(0..(params.w - 1), 0, fn x, f ->
-            f + Enum.at(params.channel, x + y * params.w) * Enum.at(fx, x) * fy
+            f + :array.get(x + y * params.w, params.channel) * :array.get(x, fx) * fy
           end)
       end)
 
