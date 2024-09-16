@@ -15,10 +15,9 @@ defmodule Thumbhash.MixProject do
       description: @description,
       package: package(),
       source_url: "https://github.com/Hentioe/thumbhash-ex",
-      homepage_url: "https://github.com/Hentioe/thumbhash-ex",
       docs: [
         # The main page in the docs
-        main: "Thumbhash",
+        main: "readme",
         extras: ["README.md"]
       ]
     ]
