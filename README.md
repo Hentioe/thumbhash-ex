@@ -1,6 +1,11 @@
 # Thumbhash
 
+[![Module Version](https://img.shields.io/hexpm/v/thumbhash.svg)](https://hex.pm/packages/thumbhash)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/thumbhash/)
+
 This is a pure Elixir implementation of [ThumbHash](https://github.com/evanw/thumbhash).
+
+[中文教程](https://blog.hentioe.dev/posts/elixir-thumbhash.html)
 
 ## Current status
 
