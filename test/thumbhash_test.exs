@@ -5,7 +5,7 @@ defmodule ThumbhashTest do
   import Thumbhash
 
   test "rgba_to_thumb_hash/3" do
-    image = Image.open!("flower.jpg")
+    image = Image.open!(Path.join("img", "flower.jpg"))
 
     rgba =
       if Image.has_alpha?(image) do

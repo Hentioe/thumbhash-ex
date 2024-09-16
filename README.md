@@ -29,7 +29,7 @@ end
 Example (use [`Image`](https://github.com/elixir-image/image) to get image data):
 
 ```elixir
-image = Image.open!("flower.jpg")
+image = Image.open!(Path.join("img", "flower.jpg"))
 
 rgba =
   if Image.has_alpha?(image) do
