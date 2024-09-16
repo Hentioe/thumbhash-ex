@@ -1,5 +1,5 @@
 defmodule Thumbhash do
-  @moduledoc "APIs of Thumbhash"
+  @moduledoc "Implementation of ThumbHash in Elixir"
 
   alias Thumbhash.{ChannelEncoder, FitError}
 
@@ -33,6 +33,16 @@ defmodule Thumbhash do
     end
   end
 
+  @doc """
+  Encodes an RGBA image to a ThumbHash.
+
+  ## Note
+    - `w` and `h` cannot exceed `100`
+    - `rgba` is required to be an `:array.array()`
+
+  Returns a binary of hash.
+  """
+  @spec rgba_to_thumb_hash(1..100, 1..100, :array.array()) :: binary
   def rgba_to_thumb_hash(w, h, rgba) do
     # Encoding an image larger than 100x100 is slow with no benefit
     if w > 100 or h > 100, do: raise(FitError, "#{w}x#{h} doesn't fit in 100x100")
