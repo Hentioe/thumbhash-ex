@@ -13,9 +13,9 @@ Which only implements the encoding-related APIs, without decoding functionality.
 
 ## Preview
 
-| File       |             Original             |                  Placeholder                  | base64                         |
-| ---------- | :------------------------------: | :-------------------------------------------: | ------------------------------ |
-| flower.jpg | ![Origin image](/img/flower.jpg) | ![ThumbHash image](/img/flower-thumbhash.png) | `k0oGLQaSVsN0BVhn2oq2Z5SQUQcZ` |
+| File       |                                      Original                                       |                                           Placeholder                                            | base64                         |
+| ---------- | :---------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: | ------------------------------ |
+| flower.jpg | ![Origin image](https://github.com/Hentioe/thumbhash-ex/blob/master/img/flower.jpg?raw=true) | ![ThumbHash image](https://github.com/Hentioe/thumbhash-ex/blob/master/img/flower-thumbhash.png?raw=true) | `k0oGLQaSVsN0BVhn2oq2Z5SQUQcZ` |
 
 ## Installation
 
