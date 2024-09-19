@@ -18,7 +18,7 @@ defmodule ThumbhashTest do
         :binary.bin_to_list(data)
       end
 
-    bytes = rgba_to_thumb_hash(75, 100, :array.from_list(rgba))
+    bytes = rgba_to_thumb_hash(75, 100, Aja.Vector.new(rgba))
 
     assert Base.encode64(bytes) == "k0oGLQaSVsN0BVhn2oq2Z5SQUQcZ"
   end

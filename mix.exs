@@ -46,7 +46,8 @@ defmodule Thumbhash.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.34.2", only: [:dev], runtime: false},
       {:benchee, "~> 1.3", only: [:dev]},
-      {:image, "~> 0.54.3", only: [:dev, :test]}
+      {:image, "~> 0.54.3", only: [:dev, :test]},
+      {:aja, "~> 0.7.0"}
     ]
   end
 end

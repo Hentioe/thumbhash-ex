@@ -11,10 +11,10 @@ rgba =
     :binary.bin_to_list(data)
   end
 
-rgba_array = :array.from_list(rgba)
+rbga_vector = Aja.Vector.new(rgba)
 
 Benchee.run(%{
   "rgba_to_thumb_hash/3" => fn ->
-    Thumbhash.rgba_to_thumb_hash(75, 100, rgba_array)
+    Thumbhash.rgba_to_thumb_hash(75, 100, rbga_vector)
   end
 })

@@ -1,13 +1,15 @@
 defmodule Thumbhash.ChannelEncoder do
   @moduledoc false
 
+  alias Aja.Vector
+
   defmodule Params do
     @moduledoc false
 
     defstruct [:channel, :nx, :ny, :w, :h]
 
     @type t :: %__MODULE__{
-            channel: :array.array(),
+            channel: Vector.t(0..255),
             nx: non_neg_integer,
             ny: non_neg_integer,
             w: non_neg_integer,
@@ -41,8 +43,8 @@ defmodule Thumbhash.ChannelEncoder do
   defp step_by_cx(params, cx, cy, {ac, dc, scale})
        when cx * params.ny < params.nx * (params.ny - cy) do
     fx =
-      Enum.reduce(0..(params.w - 1), :array.new(), fn x, fx ->
-        :array.set(x, :math.cos(:math.pi() / params.w * cx * (x + 0.5)), fx)
+      Enum.reduce(0..(params.w - 1), Vector.new(), fn x, fx ->
+        Vector.append(fx, :math.cos(:math.pi() / params.w * cx * (x + 0.5)))
       end)
 
     f =
@@ -51,7 +53,7 @@ defmodule Thumbhash.ChannelEncoder do
 
         f +
           Enum.reduce(0..(params.w - 1), 0, fn x, f ->
-            f + :array.get(x + y * params.w, params.channel) * :array.get(x, fx) * fy
+            f + params.channel[x + y * params.w] * fx[x] * fy
           end)
       end)
 

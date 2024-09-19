@@ -2,6 +2,7 @@ defmodule Thumbhash do
   @moduledoc "Implementation of ThumbHash in Elixir"
 
   alias Thumbhash.{FitError, ChannelEncoder}
+  alias Aja.Vector
 
   import ChannelEncoder, only: [encode_channel: 1]
   import Bitwise
@@ -22,16 +23,7 @@ defmodule Thumbhash do
   defmodule LQPA do
     @moduledoc false
 
-    defstruct l: :array.new(), q: :array.new(), p: :array.new(), a: :array.new()
-
-    def new(size) do
-      %__MODULE__{
-        l: :array.new(size),
-        q: :array.new(size),
-        p: :array.new(size),
-        a: :array.new(size)
-      }
-    end
+    defstruct l: Vector.new(), q: Vector.new(), p: Vector.new(), a: Vector.new()
   end
 
   @doc """
@@ -44,7 +36,7 @@ defmodule Thumbhash do
 
   Returns a binary of hash.
   """
-  @spec rgba_to_thumb_hash(1..100, 1..100, :array.array()) :: binary
+  @spec rgba_to_thumb_hash(1..100, 1..100, Vector.t(0..255)) :: binary
   def rgba_to_thumb_hash(w, h, rgba) do
     # Encoding an image larger than 100x100 is slow with no benefit
     if w > 100 or h > 100, do: raise(FitError, "#{w}x#{h} doesn't fit in 100x100")
@@ -164,10 +156,10 @@ defmodule Thumbhash do
     avg =
       Enum.reduce(0..(pixels_count - 1), %RGBA{}, fn i, %{r: r, g: g, b: b, a: a} ->
         j = i * 4
-        alpha = :array.get(j + 3, rgba) / 255
-        avg_r = r + alpha / 255 * :array.get(j, rgba)
-        avg_g = g + alpha / 255 * :array.get(j + 1, rgba)
-        avg_b = b + alpha / 255 * :array.get(j + 2, rgba)
+        alpha = rgba[j + 3] / 255
+        avg_r = r + alpha / 255 * rgba[j]
+        avg_g = g + alpha / 255 * rgba[j + 1]
+        avg_b = b + alpha / 255 * rgba[j + 2]
         avg_a = a + alpha
 
         %RGBA{
@@ -190,18 +182,18 @@ defmodule Thumbhash do
   end
 
   defp caculate_lqpa(pixels_count, avg, rgba) do
-    Enum.reduce(0..(pixels_count - 1), LQPA.new(pixels_count), fn i, lqpa ->
+    Enum.reduce(0..(pixels_count - 1), %LQPA{}, fn i, lqpa ->
       %{l: l, q: q, p: p, a: a} = lqpa
       j = i * 4
-      alpha = :array.get(j + 3, rgba) / 255
-      r = avg.r * (1 - alpha) + alpha / 255 * :array.get(j, rgba)
-      g = avg.g * (1 - alpha) + alpha / 255 * :array.get(j + 1, rgba)
-      b = avg.b * (1 - alpha) + alpha / 255 * :array.get(j + 2, rgba)
+      alpha = rgba[j + 3] / 255
+      r = avg.r * (1 - alpha) + alpha / 255 * rgba[j]
+      g = avg.g * (1 - alpha) + alpha / 255 * rgba[j + 1]
+      b = avg.b * (1 - alpha) + alpha / 255 * rgba[j + 2]
 
-      l = :array.set(i, (r + g + b) / 3, l)
-      p = :array.set(i, (r + g) / 2 - b, p)
-      q = :array.set(i, r - g, q)
-      a = :array.set(i, alpha, a)
+      l = Vector.append(l, (r + g + b) / 3)
+      p = Vector.append(p, (r + g) / 2 - b)
+      q = Vector.append(q, r - g)
+      a = Vector.append(a, alpha)
 
       %LQPA{
         l: l,
