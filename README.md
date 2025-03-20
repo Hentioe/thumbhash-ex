@@ -11,6 +11,11 @@ This is a pure Elixir implementation of [ThumbHash](https://github.com/evanw/thu
 
 Which only implements the encoding-related APIs, without decoding functionality. **During the alpha release phase, the API may undergo incompatible changes.**
 
+running 'mix thumbhash.install' will download thumbhash.js install it to the assets/vendor directory, install the hook into the assets/hooks directory
+to decode the hash add the hook to your liveview hooks and add the data-thumbhash={@thumbhash} to the corresponding img element ex.  <img class="pt-1" id="main_image" src={@url} width="150" height="100" data-thumbhash={@thumbhash} phx-hook="ThumbHash" />
+
+you will also need to import the library into your app js
+
 ## Preview
 
 | File       |                                      Original                                       |                                           Placeholder                                            | base64                         |

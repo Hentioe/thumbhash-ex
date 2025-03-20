@@ -49,4 +49,11 @@ defmodule Thumbhash.MixProject do
       {:image, "~> 0.54.3", only: [:dev, :test]}
     ]
   end
+
+  defp aliases do
+    [
+      c: "compile",
+      install: ["Thumbhash.install"]
+    ]
+  end
 end
